@@ -4,7 +4,6 @@ type None[T any] struct{}
 
 type Option[T any] struct {
 	some *T
-	none None[T]
 }
 
 func (o Option[T]) None() bool {
@@ -23,7 +22,6 @@ func O[T any](v ...T) Option[T] {
 	}
 	return Option[T]{
 		some: t,
-		none: None[T]{},
 	}
 }
 
