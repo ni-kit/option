@@ -23,6 +23,15 @@ user := option.Default(maybeUser, defaultUser)
 fmt.Println(user == aUser) // => true
 ```
 
+Call a function if Option is Some:
+```go
+// option.Option[User]
+maybeUser := option.O(aUser)
+maybeUser.Some(func(u User) {
+	fmt.Println("name: ", u.Name)
+}) // name: B
+```
+
 Unpack _None[User]_:
 ```go
 maybeUser := option.O[User]() // option.None[User]

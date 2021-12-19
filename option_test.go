@@ -145,3 +145,24 @@ func ExampleTestDefaultv_2() {
 	fmt.Println(someUser)
 	// Output: {Douglas Adams 49}
 }
+
+func ExampleOption_Some() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	maybeUser.Some(func(u User) {
+		fmt.Println(u.Name)
+	})
+	// Output: Douglas Adams
+}
+
+func ExampleOption_Some_2() {
+	maybeUser := option.O[User]()
+
+	maybeUser.Some(func(u User) {
+		fmt.Println(u.Name)
+	})
+	// Output:
+}

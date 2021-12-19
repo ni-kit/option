@@ -6,12 +6,21 @@ type Option[T any] struct {
 	some *T
 }
 
-func (o Option[T]) None() bool {
+func (o Option[T]) IsNone() bool {
 	return o.some == nil
 }
 
-func (o Option[T]) Some() bool {
-	return !o.None()
+func (o Option[T]) IsSome() bool {
+	return !o.IsNone()
+}
+
+// Some will execute a function if option is not none
+func (o Option[T]) Some(t SomeFunc[T]) bool {
+	if o.IsSome() {
+		t(*o.some)
+		return true
+	}
+	return false
 }
 
 // O is used to construct the Option value
@@ -40,7 +49,7 @@ func Switch[T any](
 	t SomeFunc[T],
 	n NoneFunc,
 ) bool {
-	if o.Some() {
+	if o.IsSome() {
 		t(*o.some)
 		return true
 	}
@@ -54,7 +63,7 @@ func Switcht[T any](
 	t SomeFunc[T],
 	n NoneFunc,
 ) *T {
-	if o.Some() {
+	if o.IsSome() {
 		t(*o.some)
 		return o.some
 	}
@@ -68,7 +77,7 @@ func Switchv[T any](
 	t SomeFuncv[T],
 	n NoneFuncv[T],
 ) T {
-	if o.Some() {
+	if o.IsSome() {
 		return t(*o.some)
 	}
 	return n()
