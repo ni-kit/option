@@ -1,5 +1,7 @@
 package option
 
+import "encoding/json"
+
 type (
 	// Some funcs
 	SomeFunc[T any]  func(t T)
@@ -11,6 +13,22 @@ type (
 
 type Option[T any] struct {
 	some *T
+}
+
+func (o Option[T]) MarshalJSON() ([]byte, error) {
+	if o.IsSome() {
+		return json.Marshal(*o.some)
+	}
+	return []byte(`null`), nil
+}
+
+func (o *Option[T]) UnmarshalJSON(bytes []byte) error {
+	var v *T
+	if err := json.Unmarshal(bytes, &v); err != nil {
+		return err
+	}
+	o.some = v
+	return nil
 }
 
 // O is used to construct the Option value
