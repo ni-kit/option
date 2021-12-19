@@ -42,6 +42,29 @@ func ExampleSwitch_none() {
 	// is none? true
 }
 
+func ExampleSwitchPtr() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	isSome := maybeUser.SwitchPtr(
+		func(u *User) {
+			fmt.Printf("Got user %s of age %d\n", u.Name, u.Age)
+			u.Age++
+		},
+		func() {
+			fmt.Println("Oops! No user")
+		})
+	fmt.Println("is some?", isSome)
+	maybeUser.Some(func(u User) {
+		fmt.Println("age", u.Age)
+	})
+	// Output: Got user Douglas Adams of age 42
+	// is some? true
+	// age 43
+}
+
 func ExampleSwitcht() {
 	maybeUser := option.O(User{
 		Name: "Douglas Adams",
@@ -77,6 +100,25 @@ func ExampleSwitcht_ptr() {
 	// Output: User: &{Douglas Adams 24}
 }
 
+func ExampleSwitchPtrt() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	someUser := maybeUser.SwitchPtrt(
+		func(u *User) {
+			fmt.Printf("Got user %s of age %d\n", u.Name, u.Age)
+			u.Age++
+		},
+		func() {
+			fmt.Println("Oops! No user")
+		})
+	fmt.Println(*someUser)
+	// Output: Got user Douglas Adams of age 42
+	// {Douglas Adams 43}
+}
+
 func ExampleTestSwitchv() {
 	maybeUser := option.O(User{
 		Name: "Douglas Adams",
@@ -94,6 +136,26 @@ func ExampleTestSwitchv() {
 		})
 	fmt.Println(someUser)
 	// Output: {Douglas Adams 24}
+}
+
+func ExampleTestSwitchPtrv() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	someUser := maybeUser.SwitchPtrv(
+		func(u *User) {
+			fmt.Println("got user age", u.Age)
+			u.Age = 24
+		},
+		func() User {
+			fmt.Println("Oops! No user")
+			return User{Name: "Default"}
+		})
+	fmt.Println(someUser)
+	// Output: got user age 42
+	// {Douglas Adams 24}
 }
 
 func ExampleTestDefault() {
@@ -142,6 +204,17 @@ func ExampleTestDefaultv_2() {
 	// Output: {Douglas Adams 49}
 }
 
+func ExampleTestDefaultPtrv() {
+	maybeUser := option.O[User]()
+
+	someUser := maybeUser.DefaultPtrv(User{Name: "Douglas Adams", Age: 42},
+		func(u *User) {
+			u.Age = 24
+		})
+	fmt.Println(someUser)
+	// Output: {Douglas Adams 42}
+}
+
 func ExampleOption_Some() {
 	maybeUser := option.O(User{
 		Name: "Douglas Adams",
@@ -182,4 +255,33 @@ func ExampleOption_SomePtr_2() {
 		fmt.Println(u.Name)
 	})
 	// Output:
+}
+
+func ExampleOption_SomePtr_3() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	maybeUser.SomePtr(func(u *User) {
+		u.Age++
+	})
+
+	user := maybeUser.Default(User{})
+	fmt.Println(user.Age)
+	// Output: 43
+}
+
+func ExampleOption_SomePtrt() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	u := maybeUser.SomePtrt(func(u *User) *User {
+		u.Age = 49
+		return u
+	})
+	fmt.Println(u.Age)
+	// Output: 49
 }
