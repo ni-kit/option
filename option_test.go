@@ -162,3 +162,24 @@ func ExampleOption_Some_2() {
 	})
 	// Output:
 }
+
+func ExampleOption_SomePtr() {
+	maybeUser := option.O(User{
+		Name: "Douglas Adams",
+		Age:  42,
+	})
+
+	maybeUser.SomePtr(func(u *User) {
+		fmt.Println(u.Name)
+	})
+	// Output: Douglas Adams
+}
+
+func ExampleOption_SomePtr_2() {
+	maybeUser := option.O[User]()
+
+	maybeUser.SomePtr(func(u *User) {
+		fmt.Println(u.Name)
+	})
+	// Output:
+}

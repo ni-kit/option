@@ -23,6 +23,14 @@ func (o Option[T]) Some(t SomeFunc[T]) bool {
 	return false
 }
 
+func (o Option[T]) SomePtr(t SomeFunc[*T]) bool {
+	if o.IsSome() {
+		t(o.some)
+		return true
+	}
+	return false
+}
+
 // Switch is used to work with the value in the Option container, returns true if the value is Some
 func (o Option[T]) Switch(
 	t SomeFunc[T],
