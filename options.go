@@ -13,8 +13,32 @@ func (opts Options[T]) Filter(fn FilterFunc[T]) (res []T) {
 	return Filter(opts, fn)
 }
 
+func (opts Options[T]) FilterPtr(fn FilterFunc[*T]) (res []T) {
+	return FilterPtr(opts, fn)
+}
+
 func (opts Options[T]) FilterIdx(fn FilterFuncIdx[T]) (res []T) {
 	return FilterIdx(opts, fn)
+}
+
+func (opts Options[T]) FilterPtrIdx(fn FilterFuncIdx[*T]) (res []T) {
+	return FilterPtrIdx(opts, fn)
+}
+
+func (opts Options[T]) Each(fn EachFunc[T]) {
+	Each(opts, fn)
+}
+
+func (opts Options[T]) EachPtr(fn EachFunc[*T]) {
+	EachPtr(opts, fn)
+}
+
+func (opts Options[T]) EachIdx(fn EachFuncIdx[T]) {
+	EachIdx(opts, fn)
+}
+
+func (opts Options[T]) EachPtrIdx(fn EachFuncIdx[*T]) {
+	EachPtrIdx(opts, fn)
 }
 
 func (opts *Options[T]) Push(t T) {
@@ -26,6 +50,8 @@ func (opts Options[T]) Append(t T) Options[T] {
 }
 
 type (
+	EachFunc[T any]           func(some T)
+	EachFuncIdx[T any]        func(i int, some T)
 	FilterFunc[T any]         func(some T) bool
 	FilterFuncIdx[T any]      func(i int, some T) bool
 	MapFunc[T any, R any]     func(some T) R
@@ -33,6 +59,38 @@ type (
 	FoldFunc[T any, R any]    func(acc R, next T) R
 	FoldFuncIdx[T any, R any] func(i int, acc R, next T) R
 )
+
+func Each[T any](opts Options[T], fn EachFunc[T]) {
+	for _, opt := range opts {
+		opt.Some(func(some T) {
+			fn(some)
+		})
+	}
+}
+
+func EachPtr[T any](opts Options[T], fn EachFunc[*T]) {
+	for _, opt := range opts {
+		opt.SomePtr(func(some *T) {
+			fn(some)
+		})
+	}
+}
+
+func EachIdx[T any](opts Options[T], fn EachFuncIdx[T]) {
+	for i, opt := range opts {
+		opt.Some(func(some T) {
+			fn(i, some)
+		})
+	}
+}
+
+func EachPtrIdx[T any](opts Options[T], fn EachFuncIdx[*T]) {
+	for i, opt := range opts {
+		opt.SomePtr(func(some *T) {
+			fn(i, some)
+		})
+	}
+}
 
 // Map is used to iterate through an options
 func Map[T any, R any](opts Options[T], fn MapFunc[T, R]) (res []R) {
@@ -64,11 +122,33 @@ func Filter[T any](opts Options[T], fn FilterFunc[T]) (res []T) {
 	return res
 }
 
+func FilterPtr[T any](opts Options[T], fn FilterFunc[*T]) (res []T) {
+	for _, opt := range opts {
+		opt.SomePtr(func(some *T) {
+			if fn(some) {
+				res = append(res, *some)
+			}
+		})
+	}
+	return res
+}
+
 func FilterIdx[T any](opts Options[T], fn FilterFuncIdx[T]) (res []T) {
 	for i, opt := range opts {
 		opt.Some(func(some T) {
 			if fn(i, some) {
 				res = append(res, some)
+			}
+		})
+	}
+	return res
+}
+
+func FilterPtrIdx[T any](opts Options[T], fn FilterFuncIdx[*T]) (res []T) {
+	for i, opt := range opts {
+		opt.SomePtr(func(some *T) {
+			if fn(i, some) {
+				res = append(res, *some)
 			}
 		})
 	}

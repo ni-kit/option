@@ -59,3 +59,30 @@ maybeUser.Switch(
         fmt.Println("Got nothing")
     })
 ```
+
+### Iterate
+
+```go 
+opts := option.Slice[User](
+    User{Name: "Douglas", Age: 42},
+    User{Name: "Neil", Age: 61},
+)
+
+opts.EachPtr(func(s *User) {
+    s.Age*=2
+})
+opts.Each(func(s User) {
+    fmt.Println(s)
+})
+// => {Douglas 84}
+// => {Neil 122}
+
+ultimateWriter := option.FoldIdxl(opts, func(i int, res User, next User) User {
+    if i != len(opts)-1 {
+        res.Name += next.Name + " "
+    }
+    res.Age += next.Age
+    return res
+}, User{})
+fmt.Println(ultimateWriter) // {Douglas Neil 206}
+```
