@@ -1,5 +1,19 @@
 package option
 
+type (
+	EachFunc[T any]           func(some T)
+	EachFuncIdx[T any]        func(i int, some T)
+	FilterFunc[T any]         func(some T) bool
+	FilterFuncIdx[T any]      func(i int, some T) bool
+	MapFunc[T any, R any]     func(some T) R
+	MapFuncIdx[T any, R any]  func(i int, some T) R
+	FoldFunc[T any, R any]    func(acc R, next T) R
+	FoldFuncIdx[T any, R any] func(i int, acc R, next T) R
+	// temporary due to the limited nature of current generics implementation
+	MaptFunc[T any]    func(some T) T
+	MaptFuncIdx[T any] func(i int, some T) T
+)
+
 type Options[T any] []Option[T]
 
 func Slice[T any](ts ...T) (res Options[T]) {
@@ -65,16 +79,23 @@ func (opts Options[T]) Append(t T) Options[T] {
 	return append(opts, O(t))
 }
 
-type (
-	EachFunc[T any]           func(some T)
-	EachFuncIdx[T any]        func(i int, some T)
-	FilterFunc[T any]         func(some T) bool
-	FilterFuncIdx[T any]      func(i int, some T) bool
-	MapFunc[T any, R any]     func(some T) R
-	MapFuncIdx[T any, R any]  func(i int, some T) R
-	FoldFunc[T any, R any]    func(acc R, next T) R
-	FoldFuncIdx[T any, R any] func(i int, acc R, next T) R
-)
+func (opts Options[T]) Mapt(fn MaptFunc[T]) (res []T) {
+	for _, opt := range opts {
+		opt.Some(func(some T) {
+			res = append(res, fn(some))
+		})
+	}
+	return res
+}
+
+func (opts Options[T]) MaptIdx(fn MaptFuncIdx[T]) (res []T) {
+	for i, opt := range opts {
+		opt.Some(func(some T) {
+			res = append(res, fn(i, some))
+		})
+	}
+	return res
+}
 
 func Each[T any](opts Options[T], fn EachFunc[T]) {
 	for _, opt := range opts {
