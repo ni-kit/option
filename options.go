@@ -2,6 +2,13 @@ package option
 
 type Options[T any] []Option[T]
 
+func Slice[T any](ts ...T) (res Options[T]) {
+	for _, t := range ts {
+		res.Push(t)
+	}
+	return
+}
+
 func (opts Options[T]) Filter(fn FilterFunc[T]) (res []T) {
 	return Filter(opts, fn)
 }
@@ -12,6 +19,10 @@ func (opts Options[T]) FilterIdx(fn FilterFuncIdx[T]) (res []T) {
 
 func (opts *Options[T]) Push(t T) {
 	*opts = append(*opts, O(t))
+}
+
+func (opts Options[T]) Append(t T) Options[T] {
+	return append(opts, O(t))
 }
 
 type (
