@@ -23,6 +23,66 @@ func (o Option[T]) Some(t SomeFunc[T]) bool {
 	return false
 }
 
+// Switch is used to work with the value in the Option container, returns true if the value is Some
+func (o Option[T]) Switch(
+	t SomeFunc[T],
+	n NoneFunc,
+) bool {
+	if o.IsSome() {
+		t(*o.some)
+		return true
+	}
+	n()
+	return false
+}
+
+func (o Option[T]) Switcht(
+	t SomeFunc[T],
+	n NoneFunc,
+) *T {
+	if o.IsSome() {
+		t(*o.some)
+		return o.some
+	}
+	n()
+	return nil
+}
+
+// Switchv is used to work with the value in the Option container and return it afterwards
+func (o Option[T]) Switchv(
+	t SomeFuncv[T],
+	n NoneFuncv[T],
+) T {
+	if o.IsSome() {
+		return t(*o.some)
+	}
+	return n()
+}
+
+// Default can be used to unpack Option and return either Value or provided default value
+func (o Option[T]) Default(
+	def T,
+) T {
+	return o.Switchv(
+		func(some T) T {
+			return some
+		},
+		func() T {
+			return def
+		})
+}
+
+// Defaultv can be used to unpack Option and return either Value processed with a callback or provided default value
+func (o Option[T]) Defaultv(
+	def T,
+	t SomeFuncv[T],
+) T {
+	return o.Switchv(t,
+		func() T {
+			return def
+		})
+}
+
 // O is used to construct the Option value
 func O[T any](v ...T) Option[T] {
 	var t *T
@@ -42,69 +102,3 @@ type (
 	NoneFunc         func()
 	NoneFuncv[T any] func() T
 )
-
-// Switch is used to work with the value in the Option container, returns true if the value is Some
-func Switch[T any](
-	o Option[T],
-	t SomeFunc[T],
-	n NoneFunc,
-) bool {
-	if o.IsSome() {
-		t(*o.some)
-		return true
-	}
-	n()
-	return false
-}
-
-// Switcht is used to work with the value in the Option container and return either *some or nil
-func Switcht[T any](
-	o Option[T],
-	t SomeFunc[T],
-	n NoneFunc,
-) *T {
-	if o.IsSome() {
-		t(*o.some)
-		return o.some
-	}
-	n()
-	return o.some
-}
-
-// Switchv is used to work with the value in the Option container and return it afterwards
-func Switchv[T any](
-	o Option[T],
-	t SomeFuncv[T],
-	n NoneFuncv[T],
-) T {
-	if o.IsSome() {
-		return t(*o.some)
-	}
-	return n()
-}
-
-// Default can be used to unpack Option and return either Value or provided default value
-func Default[T any](
-	o Option[T],
-	def T,
-) T {
-	return Switchv(o,
-		func(some T) T {
-			return some
-		},
-		func() T {
-			return def
-		})
-}
-
-// Defaultv can be used to unpack Option and return either Value processed with a callback or provided default value
-func Defaultv[T any](
-	o Option[T],
-	def T,
-	t SomeFuncv[T],
-) T {
-	return Switchv(o, t,
-		func() T {
-			return def
-		})
-}

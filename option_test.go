@@ -16,7 +16,7 @@ func ExampleSwitch() {
 		Age:  42,
 	})
 
-	isSome := option.Switch(maybeUser,
+	isSome := maybeUser.Switch(
 		func(u User) {
 			fmt.Printf("Got user %s of age %d\n", u.Name, u.Age)
 		},
@@ -30,7 +30,7 @@ func ExampleSwitch() {
 
 func ExampleSwitch_none() {
 	maybeUser := option.O[User]()
-	isSome := option.Switch(maybeUser,
+	isSome := maybeUser.Switch(
 		func(u User) {
 			fmt.Printf("Got user %s of age %d\n", u.Name, u.Age)
 		},
@@ -48,7 +48,7 @@ func ExampleSwitcht() {
 		Age:  42,
 	})
 
-	someUser := option.Switcht(maybeUser,
+	someUser := maybeUser.Switcht(
 		func(u User) {
 			fmt.Printf("Got user %s of age %d\n", u.Name, u.Age)
 		},
@@ -66,7 +66,7 @@ func ExampleSwitcht_ptr() {
 		Age:  42,
 	})
 
-	someUser := option.Switcht(maybeUser,
+	someUser := maybeUser.Switcht(
 		func(u *User) {
 			u.Age = 24
 		},
@@ -83,7 +83,7 @@ func ExampleTestSwitchv() {
 		Age:  42,
 	})
 
-	someUser := option.Switchv(maybeUser,
+	someUser := maybeUser.Switchv(
 		func(u User) User {
 			u.Age = 24
 			return u
@@ -99,8 +99,7 @@ func ExampleTestSwitchv() {
 func ExampleTestDefault() {
 	maybeUser := option.O[User]()
 
-	someUser := option.Default(maybeUser,
-		User{Name: "Douglas Adams", Age: 42})
+	someUser := maybeUser.Default(User{Name: "Douglas Adams", Age: 42})
 	fmt.Println(someUser)
 	// Output: {Douglas Adams 42}
 }
@@ -111,8 +110,7 @@ func ExampleTestDefault_2() {
 		Age:  42,
 	})
 
-	someUser := option.Default(maybeUser,
-		User{Name: "Douglas Adams", Age: 24})
+	someUser := maybeUser.Default(User{Name: "Douglas Adams", Age: 24})
 	fmt.Println(someUser)
 	// Output: {Douglas Adams 42}
 }
@@ -120,8 +118,7 @@ func ExampleTestDefault_2() {
 func ExampleTestDefaultv() {
 	maybeUser := option.O[User]()
 
-	someUser := option.Defaultv(maybeUser,
-		User{Name: "Douglas Adams", Age: 42},
+	someUser := maybeUser.Defaultv(User{Name: "Douglas Adams", Age: 42},
 		func(u User) User {
 			u.Age = 24
 			return u
@@ -136,8 +133,7 @@ func ExampleTestDefaultv_2() {
 		Age:  42,
 	})
 
-	someUser := option.Defaultv(maybeUser,
-		User{Name: "Douglas Adams", Age: 24},
+	someUser := maybeUser.Defaultv(User{Name: "Douglas Adams", Age: 24},
 		func(u User) User {
 			u.Age = 49
 			return u

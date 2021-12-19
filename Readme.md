@@ -19,7 +19,7 @@ Unpack _Some[User]_:
 // option.Option[User]
 maybeUser := option.O(aUser)
 // option is a user, use value, ignore default
-user := option.Default(maybeUser, defaultUser)
+user := maybeUser.Default(defaultUser)
 fmt.Println(user == aUser) // => true
 ```
 
@@ -36,13 +36,13 @@ Unpack _None[User]_:
 ```go
 maybeUser := option.O[User]() // option.None[User]
 // No user, use default
-user := option.Default(maybeUser, defaultUser)
+user := maybeUser.Default(defaultUser)
 fmt.Println(user == defaultUser) // => true
 ```
 
 Unpack _None[User]_ (verbose):
 ```go
-user := option.Switchv(maybeUser,
+user := maybeUser.Switchv(
     func(u User) User { return u },
     func() User { return defaultUser })
 fmt.Println(user == defaultUser) // => true
@@ -51,7 +51,7 @@ fmt.Println(user == defaultUser) // => true
 Switch on Option:
 ```go 
 maybeUser := option.O(aUser)
-option.Switch(maybeUser,
+maybeUser.Switch(
     func(u User) {
         fmt.Printf("Got a user %s, aged %d\n", u.Name, u.Age)
     },
