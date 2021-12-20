@@ -39,7 +39,7 @@ func (opts Options[T]) FilterPtr(fn FilterFunc[*T]) []T {
 	return FilterPtr(opts, fn)
 }
 
-func (opts Options[T]) FilterIdx(fn FilterFunci[T]) []T {
+func (opts Options[T]) Filteri(fn FilterFunci[T]) []T {
 	return Filteri(opts, fn)
 }
 
@@ -80,21 +80,15 @@ func (opts Options[T]) Append(t T) Options[T] {
 }
 
 func (opts Options[T]) Mapt(fn MaptFunc[T]) (res []T) {
-	for _, opt := range opts {
-		opt.Some(func(some T) {
-			res = append(res, fn(some))
-		})
-	}
-	return res
+	return Foldl(opts, func(res []T, next T) []T {
+		return append(res, fn(next))
+	}, []T{})
 }
 
 func (opts Options[T]) Mapti(fn MaptFunci[T]) (res []T) {
-	for i, opt := range opts {
-		opt.Some(func(some T) {
-			res = append(res, fn(i, some))
-		})
-	}
-	return res
+	return Foldli(opts, func(i int, res []T, next T) []T {
+		return append(res, fn(i, next))
+	}, []T{})
 }
 
 func Each[T any](opts Options[T], fn EachFunc[T]) {
@@ -291,6 +285,19 @@ func Foldri[T any, R any](opts Options[T], fn FoldFunci[T, R], start R) R {
 	idx := 0
 	for i := len(opts) - 1; i >= 0; i-- {
 		opts[i].Some(func(some T) {
+			start = fn(idx, start, some)
+		})
+		idx++
+	}
+	return start
+}
+
+// Foldri is used to iterate over the Options and populate the provided R[esulting] value with the help of a callback
+// Same as Foldli but goes from right to left
+func FoldrPtri[T any, R any](opts Options[T], fn FoldFunci[*T, R], start R) R {
+	idx := 0
+	for i := len(opts) - 1; i >= 0; i-- {
+		opts[i].SomePtr(func(some *T) {
 			start = fn(idx, start, some)
 		})
 		idx++
