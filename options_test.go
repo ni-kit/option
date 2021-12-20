@@ -46,6 +46,16 @@ func ExampleFilter() {
 	// Neal Stephenson is 62
 }
 
+func ExampleOFilter() {
+	options.OFilter(func(w Writer) bool {
+		return w.Alive
+	}).Each(func(w Writer) {
+		fmt.Printf("%s is %d\n", w.Name, w.Age)
+	})
+	// Output: Neil Gaiman is 61
+	// Neal Stephenson is 62
+}
+
 func ExampleFoldl() {
 	b := option.Foldl(options, func(res strings.Builder, next Writer) strings.Builder {
 		res.WriteString(next.Name)
@@ -66,8 +76,8 @@ func ExampleFoldr() {
 	// Output: Neal Stephenson and Neil Gaiman and Douglas Adams and
 }
 
-func ExampleFoldIdxl() {
-	b := option.FoldIdxl(options, func(i int, res strings.Builder, next Writer) strings.Builder {
+func ExampleFoldli() {
+	b := option.Foldli(options, func(i int, res strings.Builder, next Writer) strings.Builder {
 		res.WriteString(next.Name)
 		if i != len(options)-1 {
 			res.WriteString(" and ")
@@ -78,8 +88,8 @@ func ExampleFoldIdxl() {
 	// Output: Douglas Adams and Neil Gaiman and Neal Stephenson
 }
 
-func ExampleFoldIdxr() {
-	b := option.FoldIdxr(options, func(i int, res strings.Builder, next Writer) strings.Builder {
+func ExampleFoldri() {
+	b := option.Foldri(options, func(i int, res strings.Builder, next Writer) strings.Builder {
 		res.WriteString(next.Name)
 		if i != len(options)-1 {
 			res.WriteString(" and ")

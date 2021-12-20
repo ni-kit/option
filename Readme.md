@@ -77,7 +77,7 @@ opts.Each(func(s User) {
 // => {Douglas 84}
 // => {Neil 122}
 
-ultimateWriter := option.FoldIdxl(opts, func(i int, res User, next User) User {
+ultimateWriter := option.Foldli(opts, func(i int, res User, next User) User {
     if i != len(opts)-1 {
         res.Name += next.Name + " "
     }
