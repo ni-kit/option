@@ -1,6 +1,7 @@
 package option_test
 
 import (
+	"errors"
 	"fmt"
 	"github.com/debudda/option"
 )
@@ -284,4 +285,50 @@ func ExampleOption_SomePtrt() {
 	})
 	fmt.Println(u.Age)
 	// Output: 49
+}
+
+func ExampleOption_OkOrElse() {
+	maybeUser := option.O(User{
+		Name: "John Doe",
+		Age:  123,
+	})
+
+	maybeUser.OkOrElse(func() error {
+		return errors.New("got no user")
+	}).Switch(
+		func(u User) {
+			fmt.Printf("%#v\n", u)
+		},
+		func(err error) {
+			fmt.Println("got error", err)
+		},
+	)
+	// Output: option_test.User{Name:"John Doe", Age:123}
+}
+
+func Example_And() {
+	type Writer struct {
+		Name string
+	}
+	maybeWriter := option.O(Writer{
+		Name: "Douglas Adams",
+	})
+	maybeUser := option.O(User{
+		Name: "John Doe",
+		Age:  123,
+	})
+
+	option.And(maybeWriter, maybeUser).Some(func(u User) {
+		fmt.Printf("%#v\n", u)
+	})
+	// Output: option_test.User{Name:"John Doe", Age:123}
+}
+
+func ExampleOption_AndThen() {
+	sq := func(n int) option.Option[int] { return option.O(n * n) }
+
+	option.O(2).AndThen(sq, sq).Some(func(n int) {
+		fmt.Println(n)
+	})
+	// Output: 16
 }

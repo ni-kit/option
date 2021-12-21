@@ -86,3 +86,25 @@ ultimateWriter := option.Foldli(opts, func(i int, res User, next User) User {
 }, User{})
 fmt.Println(ultimateWriter) // {Douglas Neil 206}
 ```
+
+### Http 
+
+```go
+type User struct {
+	UserID    int    `json:"userId"`
+	ID        int    `json:"id"`
+	Title     string `json:"title"`
+	Completed bool   `json:"completed"`
+}
+
+res := httpresult.JSON[User](http.Get("https://jsonplaceholder.typicode.com/todos/1"))
+res.Ok(func(u User) {
+    fmt.Printf("%#v\n", u)
+})
+// => User{UserID:1, ID:1, Title:"delectus aut autem", Completed:false}
+
+res = httpresult.JSON[User](http.Get("https://incorrect"))
+u := res.Default(User{Title: "so default"})
+fmt.Printf("%#v\n", u)
+// => User{UserID:0, ID:0, Title:"so default", Completed:false}
+```

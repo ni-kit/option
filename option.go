@@ -188,3 +188,64 @@ func (o Option[T]) DefaultPtrv(
 			return def
 		})
 }
+
+// OkOr converts Option to Result
+func (o Option[T]) OkOr(err error) Result[T] {
+	if o.IsSome() {
+		return Ok[T](*o.some)
+	}
+	return Err[T](err)
+}
+
+// OkOrElse converts Option to Result but evaluates lazily
+func (o Option[T]) OkOrElse(errcb func() error) Result[T] {
+	if o.IsSome() {
+		return Ok[T](*o.some)
+	}
+	return Err[T](errcb())
+}
+
+func (o Option[T]) AndThen(nexts ...func(t T) Option[T]) (res Option[T]) {
+	for _, next := range nexts {
+		o.Some(func(v T) {
+			res = next(v)
+			o = res
+		})
+	}
+	return
+}
+
+func (o Option[T]) Or(other Option[T]) Option[T] {
+	if o.IsNone() {
+		return other
+	}
+	return o
+}
+
+func (o Option[T]) OrElse(other func() Option[T]) Option[T] {
+	if o.IsNone() {
+		return other()
+	}
+	return o
+}
+
+func (o Option[T]) Xor(other Option[T]) Option[T] {
+	if o.IsSome() {
+		if other.IsNone() {
+			return o
+		}
+	} else {
+		if other.IsSome() {
+			return other
+		}
+	}
+	return O[T]()
+}
+
+// And returns None if the Option is None otherwise returns other
+func And[F, S any](f Option[F], s Option[S]) Option[S] {
+	if f.IsNone() || s.IsNone() {
+		return O[S]()
+	}
+	return s
+}

@@ -114,6 +114,13 @@ func (r Result[T]) Ok(ok OkFunc[T]) {
 	}
 }
 
+func (r Result[T]) OkErr(ok OkFunc[T]) error {
+	if r.IsOk() {
+		ok(*r.t)
+	}
+	return r.e
+}
+
 func (r Result[T]) OkPtr(ok OkFunc[*T]) {
 	if r.IsOk() {
 		ok(r.t)
