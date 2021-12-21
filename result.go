@@ -114,10 +114,16 @@ func (r Result[T]) Ok(ok OkFunc[T]) {
 	}
 }
 
-func (r Result[T]) OkErr(ok OkFunc[T]) error {
-	if r.IsOk() {
-		ok(*r.t)
+func (r Result[T]) MustOk(ok OkFunc[T]) {
+	err := ErrNotOK
+	if r.IsErr() {
+		err = r.e
 	}
+	ok(r.Must(err.Error()))
+}
+
+func (r Result[T]) OkErr(ok OkFunc[T]) error {
+	r.Ok(ok)
 	return r.e
 }
 
